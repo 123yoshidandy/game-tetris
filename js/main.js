@@ -2,6 +2,10 @@ document.getElementById("hello_text").textContent = "はじめてのJavaScript";
 
 var tableElement = document.getElementById("data_table");
 
+const HEIGHT = 20;
+const WIDTH = 10;
+const START_POINT = 3;
+
 var count = 0;
 var cells = [];
 var isFalling = false;
@@ -67,7 +71,7 @@ setInterval(function () {
     count++;
     document.getElementById("hello_text").textContent = "はじめてのJavaScript(" + count + ")";
     for (var row = 0; row < 2; row++) {
-        for (var col = 0; col < 10; col++) {
+        for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].className !== "" && cells[row][col].blockNum !== fallingBlockNum) { // ★サイト間違ってる
                 alert("Game Over");
             }
@@ -84,9 +88,9 @@ setInterval(function () {
 /* -------------------- ここから関数宣言  -------------------- */
 
 function init() {
-    for (var row = 0; row < 20; row++) {
+    for (var row = 0; row < HEIGHT; row++) {
         var tr = document.createElement("tr");
-        for (var col = 0; col < 10; col++) {
+        for (var col = 0; col < WIDTH; col++) {
             var td = document.createElement("td");
             tr.appendChild(td);
         }
@@ -95,9 +99,9 @@ function init() {
 
     var td_array = document.getElementsByTagName("td");
     var index = 0;
-    for (var row = 0; row < 20; row++) {
+    for (var row = 0; row < HEIGHT; row++) {
         cells[row] = []; // 配列のそれぞれの要素を配列にする（2次元配列にする）
-        for (var col = 0; col < 10; col++) {
+        for (var col = 0; col < WIDTH; col++) {
             cells[row][col] = td_array[index];
             index++;
         }
@@ -105,14 +109,14 @@ function init() {
 }
 
 function fallBlocks() {
-    for (var col = 0; col < 10; col++) {
-        if (cells[19][col].blockNum === fallingBlockNum) {
+    for (var col = 0; col < WIDTH; col++) {
+        if (cells[HEIGHT - 1][col].blockNum === fallingBlockNum) {
             isFalling = false;
             return;
         }
     }
-    for (var row = 18; row >= 0; row--) {
-        for (var col = 0; col < 10; col++) {
+    for (var row = HEIGHT - 2; row >= 0; row--) {
+        for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].blockNum === fallingBlockNum) {
                 if (cells[row + 1][col].className !== "" && cells[row + 1][col].blockNum !== fallingBlockNum) {
                     isFalling = false;
@@ -123,8 +127,8 @@ function fallBlocks() {
     }
 
     // 下から二番目の行から繰り返しクラスを下げていく
-    for (var row = 18; row >= 0; row--) {
-        for (var col = 0; col < 10; col++) {
+    for (var row = HEIGHT - 2; row >= 0; row--) {
+        for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].blockNum === fallingBlockNum) {
                 cells[row + 1][col].className = cells[row][col].className;
                 cells[row + 1][col].blockNum = cells[row][col].blockNum;
@@ -140,21 +144,21 @@ function hasFallingBlock() {
 }
 
 function deleteRow() {
-    for (var row = 19; row >= 0; row--) {
+    for (var row = HEIGHT - 1; row >= 0; row--) {
         var canDelete = true;
-        for (var col = 0; col < 10; col++) {
+        for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].className === "") {
                 canDelete = false;
             }
         }
 
         if (canDelete) {
-            for (var col = 0; col < 10; col++) {
+            for (var col = 0; col < WIDTH; col++) {
                 cells[row][col].className = "";
             }
 
             for (var downRow = row - 1; downRow >= 0; downRow--) {  // ★サイト間違ってる
-                for (var col = 0; col < 10; col++) {
+                for (var col = 0; col < WIDTH; col++) {
                     cells[downRow + 1][col].className = cells[downRow][col].className;
                     cells[downRow + 1][col].blockNum = cells[downRow][col].blockNum;
                     cells[downRow][col].className = "";
@@ -175,8 +179,8 @@ function generateBlock() {
     for (var row = 0; row < pattern.length; row++) {
         for (var col = 0; col < pattern[row].length; col++) {
             if (pattern[row][col]) {
-                cells[row][col + 3].className = nextBlock.class;
-                cells[row][col + 3].blockNum = nextFallingBlockNum;
+                cells[row][col + START_POINT].className = nextBlock.class;
+                cells[row][col + START_POINT].blockNum = nextFallingBlockNum;
             }
         }
     }
@@ -186,16 +190,16 @@ function generateBlock() {
 }
 
 function onKeyDown(event) {
-    if (event.keyCode === 37) {
+    if (event.keyCode === 37) { // "←"
         moveLeft();
-    } else if (event.keyCode === 39) {
+    } else if (event.keyCode === 39) { // "→"
         moveRight();
     }
 }
 
 function moveRight() {
-    for (var row = 0; row < 20; row++) {
-        for (var col = 9; col >= 0; col--) {
+    for (var row = 0; row < HEIGHT; row++) {
+        for (var col = WIDTH - 1; col >= 0; col--) {
             if (cells[row][col].blockNum === fallingBlockNum) {
                 cells[row][col + 1].className = cells[row][col].className;
                 cells[row][col + 1].blockNum = cells[row][col].blockNum;
@@ -207,8 +211,8 @@ function moveRight() {
 }
 
 function moveLeft() {
-    for (var row = 0; row < 20; row++) {
-        for (var col = 0; col < 10; col++) {
+    for (var row = 0; row < HEIGHT; row++) {
+        for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].blockNum === fallingBlockNum) {
                 cells[row][col - 1].className = cells[row][col].className;
                 cells[row][col - 1].blockNum = cells[row][col].blockNum;
