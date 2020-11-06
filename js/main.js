@@ -110,47 +110,15 @@ function init() {
 }
 
 function fallBlocks() {
-    for (var col = 0; col < WIDTH; col++) {
-        if (cells[HEIGHT - 1][col].isActive) {
-            for (var row2 = 0; row2 < HEIGHT; row2++) {
-                for (var col2 = 0; col2 < WIDTH; col2++) {
-                    if (cells[row2][col2].isActive) {
-                        cells[row2][col2].isActive = false;
-                    }
-                }
-            }
-            isFalling = false;
-            return;
-        }
-    }
-    for (var row = HEIGHT - 2; row >= 0; row--) {
-        for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].isActive) {
-                if (cells[row + 1][col].className !== "" && !cells[row + 1][col].isActive) {
-                    for (var row2 = 0; row2 < HEIGHT; row2++) {
-                        for (var col2 = 0; col2 < WIDTH; col2++) {
-                            if (cells[row2][col2].isActive) {
-                                cells[row2][col2].isActive = false;
-                            }
-                        }
-                    }
-                    isFalling = false;
-                    return;
-                }
-            }
-        }
-    }
-
-    // 下から二番目の行から繰り返しクラスを下げていく
-    for (var row = HEIGHT - 2; row >= 0; row--) {
-        for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].isActive) {
-                cells[row + 1][col].className = cells[row][col].className;
-                cells[row + 1][col].isActive = cells[row][col].isActive;
-                cells[row][col].className = "";
+    var result = move(1, 0);
+    if (!result) { // 移動できない≒接地したとき
+        for (var row = 0; row < HEIGHT; row++) {
+            for (var col = 0; col < WIDTH; col++) {
                 cells[row][col].isActive = null;
             }
         }
+        isFalling = false;
+        return;
     }
 }
 
@@ -204,54 +172,46 @@ function generateBlock() {
 
 function onKeyDown(event) {
     if (event.keyCode === 37) { // "←"
-        moveLeft();
+        move(0, -1);
+    } else if (event.keyCode === 38) { // "↑"
+        var result = true;
+        while (result) { // 繰り返しによりハードドロップさせる
+            result = move(1, 0);
+        }
     } else if (event.keyCode === 39) { // "→"
-        moveRight();
+        move(0, 1);
+    } else if (event.keyCode === 40) { // "↓"
+        move(1, 0);
     }
 }
 
-function moveRight() {
+function move(dy, dx) {
+    points = []
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].isActive) {
-                if (col + 1 >= WIDTH || (cells[row][col + 1].isActive != null && !cells[row][col + 1].isActive)) {
-                    return;
+                if (col + dx < 0 || col + dx >= WIDTH || (cells[row][col + dx].className != "" && !cells[row][col + dx].isActive)) {
+                    return false;
                 }
-            }
-        }
-    }
-
-    for (var row = 0; row < HEIGHT; row++) {
-        for (var col = WIDTH - 1; col >= 0; col--) {
-            if (cells[row][col].isActive) {
-                cells[row][col + 1].className = cells[row][col].className;
-                cells[row][col + 1].isActive = cells[row][col].isActive;
-                cells[row][col].className = "";
-                cells[row][col].isActive = null;
-            }
-        }
-    }
-}
-
-function moveLeft() {
-    for (var row = 0; row < HEIGHT; row++) {
-        for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].isActive) {
-                if (col - 1 < 0 || (cells[row][col - 1].isActive != null && !cells[row][col - 1].isActive)) {
-                    return;
+                if (row + dy < 0 || row + dy >= HEIGHT || (cells[row + dy][col].className != "" && !cells[row + dy][col].isActive)) {
+                    return false;
                 }
+                points.push([row, col]);
             }
         }
     }
 
-    for (var row = 0; row < HEIGHT; row++) {
-        for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].isActive) {
-                cells[row][col - 1].className = cells[row][col].className;
-                cells[row][col - 1].isActive = cells[row][col].isActive;
-                cells[row][col].className = "";
-                cells[row][col].isActive = null;
-            }
-        }
+    var className = cells[points[0][0]][points[0][1]].className;
+
+    for (var point of points) {
+        cells[point[0]][point[1]].className = "";
+        cells[point[0]][point[1]].isActive = null;
     }
+
+    for (var point of points) {
+        cells[point[0] + dy][point[1] + dx].className = className;
+        cells[point[0] + dy][point[1] + dx].isActive = true;
+    }
+
+    return true;
 }
