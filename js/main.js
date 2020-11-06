@@ -200,6 +200,16 @@ function onKeyDown(event) {
 
 function moveRight() {
     for (var row = 0; row < HEIGHT; row++) {
+        for (var col = 0; col < WIDTH; col++) {
+            if (cells[row][col].blockNum === fallingBlockNum) {
+                if (col + 1 >= WIDTH || (cells[row][col + 1].blockNum != null && cells[row][col + 1].blockNum != fallingBlockNum)) {
+                    return;
+                }
+            }
+        }
+    }
+
+    for (var row = 0; row < HEIGHT; row++) {
         for (var col = WIDTH - 1; col >= 0; col--) {
             if (cells[row][col].blockNum === fallingBlockNum) {
                 cells[row][col + 1].className = cells[row][col].className;
@@ -212,6 +222,16 @@ function moveRight() {
 }
 
 function moveLeft() {
+    for (var row = 0; row < HEIGHT; row++) {
+        for (var col = 0; col < WIDTH; col++) {
+            if (cells[row][col].blockNum === fallingBlockNum) {
+                if (col - 1 < 0 || (cells[row][col - 1].blockNum != null && cells[row][col - 1].blockNum != fallingBlockNum)) {
+                    return;
+                }
+            }
+        }
+    }
+
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].blockNum === fallingBlockNum) {
