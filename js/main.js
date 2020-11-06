@@ -1,7 +1,9 @@
 document.getElementById("hello_text").textContent = "はじめてのJavaScript";
 
+var tableElement = document.getElementById("data_table");
+
 var count = 0;
-var cells;
+var cells = [];
 var isFalling = false;
 var fallingBlockNum = 0;
 
@@ -60,7 +62,7 @@ var blocks = {
 // キーボードイベントを監視する
 document.addEventListener("keydown", onKeyDown);
 
-loadTable();
+init();
 setInterval(function () {
     count++;
     document.getElementById("hello_text").textContent = "はじめてのJavaScript(" + count + ")";
@@ -81,8 +83,16 @@ setInterval(function () {
 
 /* -------------------- ここから関数宣言  -------------------- */
 
-function loadTable() {
-    cells = [];
+function init() {
+    for (var row = 0; row < 20; row++) {
+        var tr = document.createElement("tr");
+        for (var col = 0; col < 10; col++) {
+            var td = document.createElement("td");
+            tr.appendChild(td);
+        }
+        tableElement.appendChild(tr);
+    }
+
     var td_array = document.getElementsByTagName("td");
     var index = 0;
     for (var row = 0; row < 20; row++) {
