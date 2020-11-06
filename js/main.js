@@ -174,20 +174,19 @@ function generateBlock() {
     var keys = Object.keys(blocks);
     var nextBlockKey = keys[Math.floor(Math.random() * keys.length)];
     var nextBlock = blocks[nextBlockKey];
-    var nextFallingBlockNum = fallingBlockNum + 1;
+    fallingBlockNum++;
 
     var pattern = nextBlock.pattern;
     for (var row = 0; row < pattern.length; row++) {
         for (var col = 0; col < pattern[row].length; col++) {
             if (pattern[row][col]) {
                 cells[row][col + START_POINT].className = nextBlock.class;
-                cells[row][col + START_POINT].blockNum = nextFallingBlockNum;
+                cells[row][col + START_POINT].blockNum = fallingBlockNum;
             }
         }
     }
 
     isFalling = true;
-    fallingBlockNum = nextFallingBlockNum;
 }
 
 function onKeyDown(event) {
