@@ -74,6 +74,7 @@ var timer = setInterval(function () {
             if (cells[row][col].className !== "" && !cells[row][col].isActive) { // ★サイト間違ってる
                 clearInterval(timer);
                 alert("Game Over");
+                return;
             }
         }
     }
