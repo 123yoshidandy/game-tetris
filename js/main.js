@@ -67,12 +67,13 @@ var blocks = {
 document.addEventListener("keydown", onKeyDown);
 
 init();
-setInterval(function () {
+var timer = setInterval(function () {
     count++;
     document.getElementById("hello_text").textContent = "はじめてのJavaScript(" + count + ")";
     for (var row = 0; row < 2; row++) {
         for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].className !== "" && cells[row][col].blockNum !== fallingBlockNum) { // ★サイト間違ってる
+                clearInterval(timer);
                 alert("Game Over");
             }
         }
