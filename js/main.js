@@ -9,7 +9,6 @@ const START_POINT = 3;
 var count = 0;
 var cells = [];
 var isFalling = false;
-var fallingBlockNum = 0;
 
 // ブロックのパターン
 var blocks = {
@@ -72,7 +71,7 @@ var timer = setInterval(function () {
     document.getElementById("hello_text").textContent = "はじめてのJavaScript(" + count + ")";
     for (var row = 0; row < 2; row++) {
         for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].className !== "" && cells[row][col].blockNum !== fallingBlockNum) { // ★サイト間違ってる
+            if (cells[row][col].className !== "" && !cells[row][col].isActive) { // ★サイト間違ってる
                 clearInterval(timer);
                 alert("Game Over");
             }
@@ -111,15 +110,29 @@ function init() {
 
 function fallBlocks() {
     for (var col = 0; col < WIDTH; col++) {
-        if (cells[HEIGHT - 1][col].blockNum === fallingBlockNum) {
+        if (cells[HEIGHT - 1][col].isActive) {
+            for (var row2 = 0; row2 < HEIGHT; row2++) {
+                for (var col2 = 0; col2 < WIDTH; col2++) {
+                    if (cells[row2][col2].isActive) {
+                        cells[row2][col2].isActive = false;
+                    }
+                }
+            }
             isFalling = false;
             return;
         }
     }
     for (var row = HEIGHT - 2; row >= 0; row--) {
         for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].blockNum === fallingBlockNum) {
-                if (cells[row + 1][col].className !== "" && cells[row + 1][col].blockNum !== fallingBlockNum) {
+            if (cells[row][col].isActive) {
+                if (cells[row + 1][col].className !== "" && !cells[row + 1][col].isActive) {
+                    for (var row2 = 0; row2 < HEIGHT; row2++) {
+                        for (var col2 = 0; col2 < WIDTH; col2++) {
+                            if (cells[row2][col2].isActive) {
+                                cells[row2][col2].isActive = false;
+                            }
+                        }
+                    }
                     isFalling = false;
                     return;
                 }
@@ -130,11 +143,11 @@ function fallBlocks() {
     // 下から二番目の行から繰り返しクラスを下げていく
     for (var row = HEIGHT - 2; row >= 0; row--) {
         for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].blockNum === fallingBlockNum) {
+            if (cells[row][col].isActive) {
                 cells[row + 1][col].className = cells[row][col].className;
-                cells[row + 1][col].blockNum = cells[row][col].blockNum;
+                cells[row + 1][col].isActive = cells[row][col].isActive;
                 cells[row][col].className = "";
-                cells[row][col].blockNum = null;
+                cells[row][col].isActive = null;
             }
         }
     }
@@ -161,9 +174,9 @@ function deleteRow() {
             for (var downRow = row - 1; downRow >= 0; downRow--) {  // ★サイト間違ってる
                 for (var col = 0; col < WIDTH; col++) {
                     cells[downRow + 1][col].className = cells[downRow][col].className;
-                    cells[downRow + 1][col].blockNum = cells[downRow][col].blockNum;
+                    cells[downRow + 1][col].isActive = cells[downRow][col].isActive;
                     cells[downRow][col].className = "";
-                    cells[downRow][col].blockNum = null;
+                    cells[downRow][col].isActive = null;
                 }
             }
         }
@@ -174,14 +187,13 @@ function generateBlock() {
     var keys = Object.keys(blocks);
     var nextBlockKey = keys[Math.floor(Math.random() * keys.length)];
     var nextBlock = blocks[nextBlockKey];
-    fallingBlockNum++;
 
     var pattern = nextBlock.pattern;
     for (var row = 0; row < pattern.length; row++) {
         for (var col = 0; col < pattern[row].length; col++) {
             if (pattern[row][col]) {
                 cells[row][col + START_POINT].className = nextBlock.class;
-                cells[row][col + START_POINT].blockNum = fallingBlockNum;
+                cells[row][col + START_POINT].isActive = true;
             }
         }
     }
@@ -200,8 +212,8 @@ function onKeyDown(event) {
 function moveRight() {
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].blockNum === fallingBlockNum) {
-                if (col + 1 >= WIDTH || (cells[row][col + 1].blockNum != null && cells[row][col + 1].blockNum != fallingBlockNum)) {
+            if (cells[row][col].isActive) {
+                if (col + 1 >= WIDTH || (cells[row][col + 1].isActive != null && !cells[row][col + 1].isActive)) {
                     return;
                 }
             }
@@ -210,11 +222,11 @@ function moveRight() {
 
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = WIDTH - 1; col >= 0; col--) {
-            if (cells[row][col].blockNum === fallingBlockNum) {
+            if (cells[row][col].isActive) {
                 cells[row][col + 1].className = cells[row][col].className;
-                cells[row][col + 1].blockNum = cells[row][col].blockNum;
+                cells[row][col + 1].isActive = cells[row][col].isActive;
                 cells[row][col].className = "";
-                cells[row][col].blockNum = null;
+                cells[row][col].isActive = null;
             }
         }
     }
@@ -223,8 +235,8 @@ function moveRight() {
 function moveLeft() {
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].blockNum === fallingBlockNum) {
-                if (col - 1 < 0 || (cells[row][col - 1].blockNum != null && cells[row][col - 1].blockNum != fallingBlockNum)) {
+            if (cells[row][col].isActive) {
+                if (col - 1 < 0 || (cells[row][col - 1].isActive != null && !cells[row][col - 1].isActive)) {
                     return;
                 }
             }
@@ -233,11 +245,11 @@ function moveLeft() {
 
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].blockNum === fallingBlockNum) {
+            if (cells[row][col].isActive) {
                 cells[row][col - 1].className = cells[row][col].className;
-                cells[row][col - 1].blockNum = cells[row][col].blockNum;
+                cells[row][col - 1].isActive = cells[row][col].isActive;
                 cells[row][col].className = "";
-                cells[row][col].blockNum = null;
+                cells[row][col].isActive = null;
             }
         }
     }
