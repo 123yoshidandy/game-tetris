@@ -143,9 +143,7 @@ function deleteRow() {
             for (var downRow = row - 1; downRow >= 0; downRow--) {  // ★サイト間違ってる
                 for (var col = 0; col < WIDTH; col++) {
                     cells[downRow + 1][col].className = cells[downRow][col].className;
-                    cells[downRow + 1][col].isActive = cells[downRow][col].isActive;
                     cells[downRow][col].className = "";
-                    cells[downRow][col].isActive = null;
                 }
             }
         }
@@ -187,6 +185,7 @@ function onKeyDown(event) {
 
 function move(dy, dx) {
     points = []
+    var className = "";
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].isActive) {
@@ -197,11 +196,10 @@ function move(dy, dx) {
                     return false;
                 }
                 points.push([row, col]);
+                className = cells[row][col].className;
             }
         }
     }
-
-    var className = cells[points[0][0]][points[0][1]].className;
 
     for (var point of points) {
         cells[point[0]][point[1]].className = "";
