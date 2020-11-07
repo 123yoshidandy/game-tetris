@@ -146,6 +146,7 @@ function deleteRow() {
                     cells[downRow][col].className = "";
                 }
             }
+            row++;
         }
     }
 }
