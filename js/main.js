@@ -69,16 +69,12 @@ init();
 var timer = setInterval(function () {
     count++;
     document.getElementById("hello_text").textContent = "はじめてのJavaScript(" + count + ")";
-    for (var row = 0; row < 2; row++) {
-        for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].className !== "" && !cells[row][col].isActive) { // ★サイト間違ってる
-                clearInterval(timer);
-                alert("Game Over");
-                return;
-            }
-        }
+    if (cells[0][START_POINT].className != "" && !cells[0][START_POINT].isActive) { // ★サイト間違ってる
+        clearInterval(timer);
+        alert("Game Over");
+        return;
     }
-    if (hasFallingBlock()) {
+    if (isFalling) {
         fallBlocks();
     } else {
         deleteRow();
@@ -118,12 +114,7 @@ function fallBlocks() {
             }
         }
         isFalling = false;
-        return;
     }
-}
-
-function hasFallingBlock() {
-    return isFalling;
 }
 
 function deleteRow() {
