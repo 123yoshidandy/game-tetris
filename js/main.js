@@ -136,10 +136,6 @@ function deleteRow() {
         }
 
         if (canDelete) {
-            for (var col = 0; col < WIDTH; col++) {
-                cells[row][col].className = "";
-            }
-
             for (var downRow = row - 1; downRow >= 0; downRow--) {  // ★サイト間違ってる
                 for (var col = 0; col < WIDTH; col++) {
                     cells[downRow + 1][col].className = cells[downRow][col].className;
@@ -190,11 +186,8 @@ function move(dy, dx) {
     for (var row = 0; row < HEIGHT; row++) {
         for (var col = 0; col < WIDTH; col++) {
             if (cells[row][col].isActive) {
-                if (col + dx < 0 || col + dx >= WIDTH || (cells[row][col + dx].className != "" && !cells[row][col + dx].isActive)) {
-                    return false;
-                }
-                if (row + dy < 0 || row + dy >= HEIGHT || (cells[row + dy][col].className != "" && !cells[row + dy][col].isActive)) {
-                    return false;
+                if (row + dy < 0 || row + dy >= HEIGHT || col + dx < 0 || col + dx >= WIDTH || (cells[row + dy][col + dx].className != "" && !cells[row + dy][col + dx].isActive)) {
+                    return false; // 移動先が範囲外もしくは、既に別のブロック（≒非アクティブ）がある場合、何もしない
                 }
                 points.push([row, col]);
                 className = cells[row][col].className;
