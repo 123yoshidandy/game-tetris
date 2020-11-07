@@ -146,7 +146,7 @@ function deleteRow() {
                     cells[downRow][col].className = "";
                 }
             }
-            row++;
+            row++; // 複数行の削除のために同じ行をもう一度チェック
         }
     }
 }
