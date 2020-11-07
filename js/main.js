@@ -9,56 +9,37 @@ const START_POINT = 3;
 var count = 0;
 var cells = [];
 var isFalling = false;
+var isEnd = false;
 
 // ブロックのパターン
 var blocks = {
     i: {
         class: "i",
-        pattern: [
-            [1, 1, 1, 1]
-        ]
+        pattern: [[0, -1], [0, 0], [0, 1], [0, 2]],
     },
     o: {
         class: "o",
-        pattern: [
-            [1, 1],
-            [1, 1]
-        ]
+        pattern: [[0, 0], [0, 1], [1, 0], [1, 1]],
     },
     t: {
         class: "t",
-        pattern: [
-            [0, 1, 0],
-            [1, 1, 1]
-        ]
+        pattern: [[0, 0], [1, -1], [1, 0], [1, 1]],
     },
     s: {
         class: "s",
-        pattern: [
-            [0, 1, 1],
-            [1, 1, 0]
-        ]
+        pattern: [[0, 1], [0, 0], [1, 0], [1, -1]],
     },
     z: {
         class: "z",
-        pattern: [
-            [1, 1, 0],
-            [0, 1, 1]
-        ]
+        pattern: [[0, -1], [0, 0], [1, 0], [1, 1]],
     },
     j: {
         class: "j",
-        pattern: [
-            [1, 0, 0],
-            [1, 1, 1]
-        ]
+        pattern: [[0, -1], [1, -1], [1, 0], [1, 1]],
     },
     l: {
         class: "l",
-        pattern: [
-            [0, 0, 1],
-            [1, 1, 1]
-        ]
+        pattern: [[0, 1], [1, 1], [1, 0], [1, -1]],
     }
 };
 
@@ -69,10 +50,10 @@ init();
 var timer = setInterval(function () {
     count++;
     document.getElementById("hello_text").textContent = "はじめてのJavaScript(" + count + ")";
-    if (cells[0][START_POINT].className != "" && !cells[0][START_POINT].isActive) { // ★サイト間違ってる
+    if (isEnd) {
         clearInterval(timer);
         alert("Game Over");
-        return;
+        return;    
     }
     if (isFalling) {
         fallBlocks();
@@ -97,9 +78,9 @@ function init() {
     var td_array = document.getElementsByTagName("td");
     var index = 0;
     for (var row = 0; row < HEIGHT; row++) {
-        cells[row] = []; // 配列のそれぞれの要素を配列にする（2次元配列にする）
+        cells.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
         for (var col = 0; col < WIDTH; col++) {
-            cells[row][col] = td_array[index];
+            cells[row].push(td_array[index]);
             index++;
         }
     }
@@ -144,15 +125,13 @@ function generateBlock() {
     var nextBlock = blocks[nextBlockKey];
 
     var pattern = nextBlock.pattern;
-    for (var row = 0; row < pattern.length; row++) {
-        for (var col = 0; col < pattern[row].length; col++) {
-            if (pattern[row][col]) {
-                cells[row][col + START_POINT].className = nextBlock.class;
-                cells[row][col + START_POINT].isActive = true;
-            }
+    for (var point of pattern) {
+        if (cells[point[0]][point[1] + START_POINT].className != "") {
+            isEnd = true;
         }
+        cells[point[0]][point[1] + START_POINT].className = nextBlock.class;
+        cells[point[0]][point[1] + START_POINT].isActive = true;
     }
-
     isFalling = true;
 }
 
