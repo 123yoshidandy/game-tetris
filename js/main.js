@@ -8,7 +8,7 @@ const START_POINT = 3;
 
 var count = 0;
 var cells = [];
-var isFalling = false;
+var active_block = null;
 var isEnd = false;
 
 // ブロックのパターン
@@ -55,7 +55,7 @@ var timer = setInterval(function () {
         alert("Game Over");
         return;    
     }
-    if (isFalling) {
+    if (active_block !== null) {
         fallBlocks();
     } else {
         deleteRow();
@@ -89,12 +89,7 @@ function init() {
 function fallBlocks() {
     var result = move(1, 0);
     if (!result) { // 移動できない≒接地したとき
-        for (var row = 0; row < HEIGHT; row++) {
-            for (var col = 0; col < WIDTH; col++) {
-                cells[row][col].isActive = null;
-            }
-        }
-        isFalling = false;
+        active_block = null;
     }
 }
 
@@ -120,28 +115,33 @@ function deleteRow() {
 }
 
 function generateBlock() {
+    // TODO 導入：Next機能
     var keys = Object.keys(blocks);
     var nextBlockKey = keys[Math.floor(Math.random() * keys.length)];
     var nextBlock = blocks[nextBlockKey];
 
-    var pattern = nextBlock.pattern;
-    for (var point of pattern) {
+    for (var point of nextBlock.pattern) {
         if (cells[point[0]][point[1] + START_POINT].className != "") {
             isEnd = true;
         }
         cells[point[0]][point[1] + START_POINT].className = nextBlock.class;
-        cells[point[0]][point[1] + START_POINT].isActive = true;
     }
-    isFalling = true;
+    active_block = {
+        className: nextBlock.class,
+        pattern: nextBlock.pattern,
+        center: [0, START_POINT],
+    };
 }
 
 function onKeyDown(event) {
+    // TODO 導入：回転機能
+    // TODO 導入：ホールド機能
     if (event.keyCode === 37) { // "←"
         move(0, -1);
     } else if (event.keyCode === 38) { // "↑"
         var result = true;
         while (result) { // 繰り返しによりハードドロップさせる
-            result = move(1, 0);
+            result = move(1, 0); // TODO 修正：連打したときのバグ
         }
     } else if (event.keyCode === 39) { // "→"
         move(0, 1);
@@ -153,27 +153,34 @@ function onKeyDown(event) {
 function move(dy, dx) {
     points = []
     var className = "";
-    for (var row = 0; row < HEIGHT; row++) {
-        for (var col = 0; col < WIDTH; col++) {
-            if (cells[row][col].isActive) {
-                if (row + dy < 0 || row + dy >= HEIGHT || col + dx < 0 || col + dx >= WIDTH || (cells[row + dy][col + dx].className != "" && !cells[row + dy][col + dx].isActive)) {
-                    return false; // 移動先が範囲外もしくは、既に別のブロック（≒非アクティブ）がある場合、何もしない
-                }
-                points.push([row, col]);
-                className = cells[row][col].className;
+    for (point of active_block.pattern) {
+        row = active_block.center[0] + point[0];
+        col = active_block.center[1] + point[1];
+
+        // TODO 修正：リファクタリング
+        var puttedSelf = false;
+        for (point2 of active_block.pattern) {
+            if (active_block.center[0] + point2[0] == row + dy && active_block.center[1] + point2[1] == col + dx) {
+                puttedSelf = true;
             }
         }
+
+        if (row + dy < 0 || row + dy >= HEIGHT || col + dx < 0 || col + dx >= WIDTH || (!puttedSelf  && cells[row + dy][col + dx].className != "")) {
+            return false; // 移動先が範囲外もしくは、既に別のブロック（≒非アクティブ）がある場合、何もしない
+        }
+        points.push([row, col]);
+        className = cells[row][col].className;
     }
 
     for (var point of points) {
         cells[point[0]][point[1]].className = "";
-        cells[point[0]][point[1]].isActive = null;
     }
 
     for (var point of points) {
         cells[point[0] + dy][point[1] + dx].className = className;
-        cells[point[0] + dy][point[1] + dx].isActive = true;
     }
+
+    active_block.center = [active_block.center[0] + dy, active_block.center[1] + dx];
 
     return true;
 }
