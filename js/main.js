@@ -115,7 +115,6 @@ function deleteRow() {
 }
 
 function generateBlock() {
-    // TODO 導入：Next機能
     var keys = Object.keys(blocks);
     var nextBlockKey = keys[Math.floor(Math.random() * keys.length)];
     var nextBlock = blocks[nextBlockKey];
@@ -134,14 +133,12 @@ function generateBlock() {
 }
 
 function onKeyDown(event) {
-    // TODO 導入：回転機能
-    // TODO 導入：ホールド機能
     if (event.keyCode === 37) { // "←"
         move(0, -1);
     } else if (event.keyCode === 38) { // "↑"
         var result = true;
         while (result) { // 繰り返しによりハードドロップさせる
-            result = move(1, 0); // TODO 修正：連打したときのバグ
+            result = move(1, 0);
         }
     } else if (event.keyCode === 39) { // "→"
         move(0, 1);
@@ -157,7 +154,6 @@ function move(dy, dx) {
         row = activeBlock.center[0] + point[0];
         col = activeBlock.center[1] + point[1];
 
-        // TODO 修正：リファクタリング
         var puttedSelf = false;
         for (point2 of activeBlock.pattern) {
             if (activeBlock.center[0] + point2[0] == row + dy && activeBlock.center[1] + point2[1] == col + dx) {
