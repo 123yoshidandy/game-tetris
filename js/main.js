@@ -150,30 +150,25 @@ function onKeyDown(event) {
 function move(dy, dx) {
     points = []
     for (point of activeBlock.pattern) {
-        row = activeBlock.center[0] + point[0];
-        col = activeBlock.center[1] + point[1];
-
-        var puttedSelf = false;
-        for (point2 of activeBlock.pattern) {
-            if (activeBlock.center[0] + point2[0] == row + dy && activeBlock.center[1] + point2[1] == col + dx) {
-                puttedSelf = true;
-            }
-        }
-
-        if (row + dy < 0 || row + dy >= HEIGHT || col + dx < 0 || col + dx >= WIDTH || (!puttedSelf  && cells[row + dy][col + dx].className != "")) {
-            return false; // 移動先が範囲外もしくは、既に別のブロック（≒非アクティブ）がある場合、何もしない
-        }
-        points.push([row, col]);
+        points.push([activeBlock.center[0] + point[0], activeBlock.center[1] + point[1]]);
     }
 
-    for (var point of points) {
-        cells[point[0]][point[1]].className = "";
+    for (point of points) {
+        cells[point[0]][point[1]].className = ""; // 移動前のセルを初期化
+    }
+
+    for (point of points) {
+        if (point[0] + dy < 0 || point[0] + dy >= HEIGHT || point[1] + dx < 0 || point[1] + dx >= WIDTH || cells[point[0] + dy][point[1] + dx].className != "") {
+            for (point2 of points) {
+                cells[point2[0]][point2[1]].className = activeBlock.className; // 移動先が範囲外もしくは、既に別のブロックがある場合、元に戻す
+            }
+            return false;
+        }
     }
 
     for (var point of points) {
         cells[point[0] + dy][point[1] + dx].className = activeBlock.className;
     }
-
     activeBlock.center = [activeBlock.center[0] + dy, activeBlock.center[1] + dx];
 
     return true;
