@@ -4,7 +4,7 @@ var tableElement = document.getElementById("data_table");
 
 const HEIGHT = 20;
 const WIDTH = 10;
-const START_POINT = 3;
+const START_POINT = Math.floor((WIDTH - 1) / 2);
 
 var count = 0;
 var cells = [];
