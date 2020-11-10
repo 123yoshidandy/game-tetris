@@ -8,7 +8,7 @@ const START_POINT = 3;
 
 var count = 0;
 var cells = [];
-var active_block = null;
+var activeBlock = null;
 var isEnd = false;
 
 // ブロックのパターン
@@ -55,7 +55,7 @@ var timer = setInterval(function () {
         alert("Game Over");
         return;    
     }
-    if (active_block !== null) {
+    if (activeBlock !== null) {
         fallBlocks();
     } else {
         deleteRow();
@@ -89,7 +89,7 @@ function init() {
 function fallBlocks() {
     var result = move(1, 0);
     if (!result) { // 移動できない≒接地したとき
-        active_block = null;
+        activeBlock = null;
     }
 }
 
@@ -126,7 +126,7 @@ function generateBlock() {
         }
         cells[point[0]][point[1] + START_POINT].className = nextBlock.class;
     }
-    active_block = {
+    activeBlock = {
         className: nextBlock.class,
         pattern: nextBlock.pattern,
         center: [0, START_POINT],
@@ -153,14 +153,14 @@ function onKeyDown(event) {
 function move(dy, dx) {
     points = []
     var className = "";
-    for (point of active_block.pattern) {
-        row = active_block.center[0] + point[0];
-        col = active_block.center[1] + point[1];
+    for (point of activeBlock.pattern) {
+        row = activeBlock.center[0] + point[0];
+        col = activeBlock.center[1] + point[1];
 
         // TODO 修正：リファクタリング
         var puttedSelf = false;
-        for (point2 of active_block.pattern) {
-            if (active_block.center[0] + point2[0] == row + dy && active_block.center[1] + point2[1] == col + dx) {
+        for (point2 of activeBlock.pattern) {
+            if (activeBlock.center[0] + point2[0] == row + dy && activeBlock.center[1] + point2[1] == col + dx) {
                 puttedSelf = true;
             }
         }
@@ -180,7 +180,7 @@ function move(dy, dx) {
         cells[point[0] + dy][point[1] + dx].className = className;
     }
 
-    active_block.center = [active_block.center[0] + dy, active_block.center[1] + dx];
+    activeBlock.center = [activeBlock.center[0] + dy, activeBlock.center[1] + dx];
 
     return true;
 }
