@@ -149,7 +149,6 @@ function onKeyDown(event) {
 
 function move(dy, dx) {
     points = []
-    var className = "";
     for (point of activeBlock.pattern) {
         row = activeBlock.center[0] + point[0];
         col = activeBlock.center[1] + point[1];
@@ -165,7 +164,6 @@ function move(dy, dx) {
             return false; // 移動先が範囲外もしくは、既に別のブロック（≒非アクティブ）がある場合、何もしない
         }
         points.push([row, col]);
-        className = cells[row][col].className;
     }
 
     for (var point of points) {
@@ -173,7 +171,7 @@ function move(dy, dx) {
     }
 
     for (var point of points) {
-        cells[point[0] + dy][point[1] + dx].className = className;
+        cells[point[0] + dy][point[1] + dx].className = activeBlock.className;
     }
 
     activeBlock.center = [activeBlock.center[0] + dy, activeBlock.center[1] + dx];
