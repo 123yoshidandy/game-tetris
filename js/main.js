@@ -10,8 +10,8 @@ const START_POINT = Math.floor((WIDTH - 1) / 2);
 
 var count = 0;
 var cells = [];
-var next = [];
-var hold = [];
+var next_cells = [];
+var hold_cells = [];
 var activeBlock = null;
 var nextBlock = null;
 var holdBlock = null;
@@ -111,17 +111,17 @@ function init() {
     }
 
     for (var row = 0; row < 4; row++) {
-        next.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
+        next_cells.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
         for (var col = 0; col < 4; col++) {
-            next[row].push(td_array[index]);
+            next_cells[row].push(td_array[index]);
             index++;
         }
     }
 
     for (var row = 0; row < 4; row++) {
-        hold.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
+        hold_cells.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
         for (var col = 0; col < 4; col++) {
-            hold[row].push(td_array[index]);
+            hold_cells[row].push(td_array[index]);
             index++;
         }
     }
@@ -175,11 +175,11 @@ function generateBlock() {
     }
 
     for (var point of nextBlock.pattern) {
-        next[point[0] + 1][point[1] + 1].className = "";
+        next_cells[point[0] + 1][point[1] + 1].className = "";
     }
     nextBlock = generateNextBlock();
     for (var point of nextBlock.pattern) {
-        next[point[0] + 1][point[1] + 1].className = nextBlock.className;
+        next_cells[point[0] + 1][point[1] + 1].className = nextBlock.className;
     }
 }
 
@@ -207,7 +207,7 @@ function onKeyDown(event) {
     } else if (event.keyCode === 40) { // "↓"
         move(1, 0);
     } else if (event.keyCode === 16) { // "Shift"
-        func_hold();
+        hold();
     }
 }
 
@@ -238,36 +238,33 @@ function move(dy, dx) {
     return true;
 }
 
-function func_hold() {
-    if (isHold) {
-        return;
-    }
-    isHold = true;
+function hold() {
+    if (!isHold) {
+        isHold = true;
 
-    points = []
-    for (point of activeBlock.pattern) {
-        points.push([activeBlock.center[0] + point[0], activeBlock.center[1] + point[1]]);
-    }
-
-    for (point of points) {
-        cells[point[0]][point[1]].className = "";
-    }
-
-    if (holdBlock == null) {
-        holdBlock = activeBlock;
-        activeBlock = null;
-    } else {
-        for (var point of holdBlock.pattern) {
-            hold[point[0] + 1][point[1] + 1].className = "";
+        for (point of activeBlock.pattern) {
+            cells[activeBlock.center[0] + point[0]][activeBlock.center[1] + point[1]].className = "";
         }
-        var tmpBlock = activeBlock;
-        activeBlock = holdBlock;
-        holdBlock = tmpBlock;
-        activeBlock.center = [0, START_POINT];
-        holdBlock.center = [0, START_POINT];
-    }
 
-    for (var point of holdBlock.pattern) {
-        hold[point[0] + 1][point[1] + 1].className = holdBlock.className;
+        for (point of points) {
+        }
+
+        if (holdBlock == null) {
+            holdBlock = activeBlock;
+            activeBlock = null;
+        } else {
+            for (var point of holdBlock.pattern) {
+                hold_cells[point[0] + 1][point[1] + 1].className = "";
+            }
+            var tmpBlock = activeBlock;
+            activeBlock = holdBlock;
+            holdBlock = tmpBlock;
+            activeBlock.center = [0, START_POINT];
+            holdBlock.center = [0, START_POINT];
+        }
+
+        for (var point of holdBlock.pattern) {
+            hold_cells[point[0] + 1][point[1] + 1].className = holdBlock.className;
+        }
     }
 }
