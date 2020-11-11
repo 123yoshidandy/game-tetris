@@ -1,7 +1,8 @@
 document.getElementById("hello_text").textContent = "はじめてのJavaScript";
 
-var tableElement = document.getElementById("data_table");
+var tableElement = document.getElementById("field_table");
 var nextElement = document.getElementById("next_table");
+var holdElement = document.getElementById("hold_table");
 
 const HEIGHT = 20;
 const WIDTH = 10;
@@ -10,9 +11,12 @@ const START_POINT = Math.floor((WIDTH - 1) / 2);
 var count = 0;
 var cells = [];
 var next = [];
+var hold = [];
 var activeBlock = null;
 var nextBlock = null;
+var holdBlock = null;
 var isEnd = false;
+var isHold = false;
 
 // ブロックのパターン
 var blocks = {
@@ -87,6 +91,15 @@ function init() {
         nextElement.appendChild(tr);
     }
 
+    for (var row = 0; row < 4; row++) {
+        var tr = document.createElement("tr");
+        for (var col = 0; col < 4; col++) {
+            var td = document.createElement("td");
+            tr.appendChild(td);
+        }
+        holdElement.appendChild(tr);
+    }
+
     var td_array = document.getElementsByTagName("td");
     var index = 0;
     for (var row = 0; row < HEIGHT; row++) {
@@ -104,12 +117,21 @@ function init() {
             index++;
         }
     }
+
+    for (var row = 0; row < 4; row++) {
+        hold.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
+        for (var col = 0; col < 4; col++) {
+            hold[row].push(td_array[index]);
+            index++;
+        }
+    }
 }
 
 function fallBlocks() {
     var result = move(1, 0);
     if (!result) { // 移動できない≒接地したとき
         activeBlock = null;
+        isHold = false;
     }
 }
 
@@ -184,6 +206,8 @@ function onKeyDown(event) {
         move(0, 1);
     } else if (event.keyCode === 40) { // "↓"
         move(1, 0);
+    } else if (event.keyCode === 16) { // "Shift"
+        func_hold();
     }
 }
 
@@ -212,4 +236,38 @@ function move(dy, dx) {
     activeBlock.center = [activeBlock.center[0] + dy, activeBlock.center[1] + dx];
 
     return true;
+}
+
+function func_hold() {
+    if (isHold) {
+        return;
+    }
+    isHold = true;
+
+    points = []
+    for (point of activeBlock.pattern) {
+        points.push([activeBlock.center[0] + point[0], activeBlock.center[1] + point[1]]);
+    }
+
+    for (point of points) {
+        cells[point[0]][point[1]].className = "";
+    }
+
+    if (holdBlock == null) {
+        holdBlock = activeBlock;
+        activeBlock = null;
+    } else {
+        for (var point of holdBlock.pattern) {
+            hold[point[0] + 1][point[1] + 1].className = "";
+        }
+        var tmpBlock = activeBlock;
+        activeBlock = holdBlock;
+        holdBlock = tmpBlock;
+        activeBlock.center = [0, START_POINT];
+        holdBlock.center = [0, START_POINT];
+    }
+
+    for (var point of holdBlock.pattern) {
+        hold[point[0] + 1][point[1] + 1].className = holdBlock.className;
+    }
 }

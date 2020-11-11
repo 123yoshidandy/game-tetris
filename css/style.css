@@ -15,7 +15,7 @@ h1 {
     display: flex;
 }
 
-table {
+.field_table {
     width: 400px; /* 表の幅 */
     height: 800px; /* 表の高さ */
     /* 中央揃えにする */
@@ -23,7 +23,7 @@ table {
     margin-right: auto;
 }
 
-.next_table {
+.block_table {
     width: 160px; /* 表の幅 */
     height: 160px; /* 表の高さ */
     /* 中央揃えにする */
