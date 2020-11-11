@@ -1,6 +1,7 @@
 document.getElementById("hello_text").textContent = "はじめてのJavaScript";
 
 var tableElement = document.getElementById("data_table");
+var nextElement = document.getElementById("next_table");
 
 const HEIGHT = 20;
 const WIDTH = 10;
@@ -8,7 +9,9 @@ const START_POINT = Math.floor((WIDTH - 1) / 2);
 
 var count = 0;
 var cells = [];
+var next = [];
 var activeBlock = null;
+var nextBlock = null;
 var isEnd = false;
 
 // ブロックのパターン
@@ -75,12 +78,29 @@ function init() {
         tableElement.appendChild(tr);
     }
 
+    for (var row = 0; row < 4; row++) {
+        var tr = document.createElement("tr");
+        for (var col = 0; col < 4; col++) {
+            var td = document.createElement("td");
+            tr.appendChild(td);
+        }
+        nextElement.appendChild(tr);
+    }
+
     var td_array = document.getElementsByTagName("td");
     var index = 0;
     for (var row = 0; row < HEIGHT; row++) {
         cells.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
         for (var col = 0; col < WIDTH; col++) {
             cells[row].push(td_array[index]);
+            index++;
+        }
+    }
+
+    for (var row = 0; row < 4; row++) {
+        next.push([]); // 配列のそれぞれの要素を配列にする（2次元配列にする）
+        for (var col = 0; col < 4; col++) {
+            next[row].push(td_array[index]);
             index++;
         }
     }
@@ -115,20 +135,40 @@ function deleteRow() {
 }
 
 function generateBlock() {
-    var keys = Object.keys(blocks);
-    var nextBlockKey = keys[Math.floor(Math.random() * keys.length)];
-    var nextBlock = blocks[nextBlockKey];
+    if (nextBlock == null) {
+        nextBlock = generateNextBlock();        
+    }
 
-    for (var point of nextBlock.pattern) {
+    activeBlock = {
+        className: nextBlock.className,
+        pattern: nextBlock.pattern,
+        center: [0, START_POINT],
+    };
+
+    for (var point of activeBlock.pattern) {
         if (cells[point[0]][point[1] + START_POINT].className != "") {
             isEnd = true;
         }
-        cells[point[0]][point[1] + START_POINT].className = nextBlock.class;
+        cells[point[0]][point[1] + START_POINT].className = activeBlock.className;
     }
-    activeBlock = {
-        className: nextBlock.class,
-        pattern: nextBlock.pattern,
-        center: [0, START_POINT],
+
+    for (var point of nextBlock.pattern) {
+        next[point[0] + 1][point[1] + 1].className = "";
+    }
+    nextBlock = generateNextBlock();
+    for (var point of nextBlock.pattern) {
+        next[point[0] + 1][point[1] + 1].className = nextBlock.className;
+    }
+}
+
+function generateNextBlock() {
+    var keys = Object.keys(blocks);
+    var nextBlockKey = keys[Math.floor(Math.random() * keys.length)];
+    var tmpBlock = blocks[nextBlockKey];
+
+    return {
+        className: tmpBlock.class,
+        pattern: tmpBlock.pattern,
     };
 }
 
